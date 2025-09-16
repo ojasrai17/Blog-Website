@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+
 const Signup = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -11,9 +12,11 @@ const Signup = () => {
   });
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+
   const onChangeHandler = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
   const fileHandler = (e) => {
     setFormData({ ...formData, image: e.target.files[0] });
   };
@@ -27,21 +30,23 @@ const Signup = () => {
       data.append("password", formData.password);
       data.append("image", formData.image);
       setLoading(true);
+
       const res = await axios.post(
-        "http://localhost:4000/user/register",
+        `${import.meta.env.VITE_API_URL}/user/register`,
         data,
         {
           headers: {
-            "Content-Type": "multipart/formData",
+            "Content-Type": "multipart/form-data",
           },
         }
       );
+
       if (res.data.success) {
         toast.success(res.data.message);
         navigate("/login");
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response?.data?.message || error.message);
     } finally {
       setLoading(false);
     }
@@ -105,4 +110,5 @@ const Signup = () => {
     </div>
   );
 };
+
 export default Signup;

@@ -11,19 +11,19 @@ const Login = () => {
   });
 
   const { loginUser } = useContext(StoreContext);
-  const token = localStorage.getItem("token");
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
   const onChangeHandler = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
 
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
       const res = await axios.post(
-        "http://localhost:4000/user/login",
+        `${import.meta.env.VITE_API_URL}/user/login`,
         formData,
         {
           headers: {
@@ -31,7 +31,6 @@ const Login = () => {
           },
         }
       );
-      console.log("res", res);
       if (res.data.success) {
         const { user, token } = res.data;
         loginUser(user, token);
@@ -39,11 +38,12 @@ const Login = () => {
         navigate("/");
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response?.data?.message || error.message);
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <div>
       <div className="w-full bg-pink-200 py-12 mx-auto flex items-center justify-center ">
@@ -89,4 +89,5 @@ const Login = () => {
     </div>
   );
 };
+
 export default Login;
